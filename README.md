@@ -1,2 +1,1 @@
-# practice-of-machine-learning
-ML学习代码
+# ML 学习笔记
