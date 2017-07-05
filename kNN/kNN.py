@@ -96,7 +96,7 @@ def classify_person():
     # 分类后的标签
     classifier_result = classify(
         (person_data - min_val) / ranges, normal_matrix, dating_labels, 3)
-    print('you will probably lik1e this person: ',
+    print('you will probably like this person: ',
           result[classifier_result - 1])
 
 
