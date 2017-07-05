@@ -1,0 +1,99 @@
+
+import operator
+
+import numpy as np
+from matplotlib import pyplot as plt
+
+
+def create_dataset():
+    group = np.array([[1, 1.1], [1, 1], [0, 0], [0, 0.1]])
+    labels = ['A', 'A', 'B', 'B']
+    return group, labels
+
+
+def classify(inX, dataset, labels, k):
+    if k < 1:
+        return None
+    dataset_size = dataset.shape[0]
+    # 用inX来当中心点
+    diffMat = np.tile(inX, (dataset_size, 1)) - dataset
+    # 欧式距离计算
+    distances = (diffMat ** 2).sum(axis=1) ** 0.5
+    # 排序为了选取距离最近的k个点
+    sorted_distances_index = distances.argsort()
+    class_count = {}
+    for i in range(k):
+        vote_label = labels[sorted_distances_index[i]]
+        class_count[vote_label] = class_count.get(vote_label, 0) + 1
+    # k近邻选好按照第二个元素的次序对元组进行降序排序
+    sorted_class_count = sorted(
+        class_count.items(), key=operator.itemgetter(1), reverse=True)
+    # 返回频率最高的元素标签
+    return sorted_class_count[0][0]
+
+
+def auto_normal(dataset):
+    '''归一化特征值'''
+    min_val = dataset.min(0)
+    max_val = dataset.max(0)
+    ranges = max_val - min_val
+    normal_dataset = np.zeros(dataset.shape)
+    shape = dataset.shape[0], 1
+    normal_dataset = (dataset - np.tile(min_val, shape)) / \
+        np.tile(ranges, shape)
+
+    return normal_dataset, ranges, min_val
+
+
+def file_to_matrix(filename):
+    # 每年里程  游戏时间百分比  消费冰淇淋公升    喜欢程度
+    # 40920     8.326976	0.953952	largeDoses
+    # 14488	    7.153469	1.673904	smallDoses
+    # 26052	    1.441871	0.805124	didntLike
+    # 75136	    13.147394	0.428964	didntLike
+    # 38344	    1.669788	0.134296	didntLike
+    with open(filename) as f:
+        lines = f.readlines()
+        length = len(lines)
+        # 数据是 length * 3
+        matrix = np.zeros((length, 3))
+        labels = []
+        i = 0
+        for line in lines:
+            line = line.strip()
+            # 3列数据用tab分隔
+            data = line.split('\t')
+            matrix[i, :] = data[0:3]
+            labels.append(int(data[-1]))
+            i += 1
+        return matrix, labels
+
+
+def plt_dating(x, y, labels):
+    # 绘制约会数据散点图，并根据labels区分
+    plt.scatter(x, y, 10 * np.array(labels), 10 * np.array(labels))
+    plt.show()
+
+
+if __name__ == '__main__':
+    group, labels = create_dataset()
+    label = classify([0, 0], group, labels, 3)
+    # print(label)
+
+    dating_matrix, labels = file_to_matrix(
+        'D:\code\python\ML\kNN\datingTestSet2.txt')
+    # print(dating_matrix, labels)
+    # plt_dating(dating_matrix[:, 0], dating_matrix[:, 1], labels)
+    normal_matrix, ranges, min_val = auto_normal(dating_matrix)
+    print(normal_matrix, ranges, min_val)
+    ratio = 0.07
+    m = normal_matrix.shape[0]
+    # 测试数据量     
+    test_num = int(m * ratio)
+    err_count = 0
+    for i in range(test_num):
+        classifier_result = classify(normal_matrix[i, :], normal_matrix[test_num:m, :], labels[test_num:m], 3)
+        print('the classifier came back with: %d, the real answer is: %d' % (classifier_result, labels[i]))
+        if classifier_result != labels[i]:
+            err_count += 1
+    print('the total error rate is: %f' % (err_count / test_num))
