@@ -91,12 +91,13 @@ def classify_person():
     # 归一化特征值
     normal_matrix, ranges, min_val = auto_normal(dating_matrix)
     # person_data 需要归一化
-    # 训练后的数据是浮点数float64，所以运算前需要先将输入数据转换为浮点数    
+    # 训练后的数据是浮点数float64，所以运算前需要先将输入数据转换为浮点数
     person_data = np.array(person_data, dtype=np.float64)
     # 分类后的标签
     classifier_result = classify(
         (person_data - min_val) / ranges, normal_matrix, dating_labels, 3)
-    print('you will probably lik1e this person: ', result[classifier_result - 1])
+    print('you will probably lik1e this person: ',
+          result[classifier_result - 1])
 
 
 def test_classify_rate():
