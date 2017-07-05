@@ -11,12 +11,12 @@ def create_dataset():
     return group, labels
 
 
-def classify(inX, dataset, labels, k):
+def classify(input_X, dataset, labels, k):
     if k < 1:
         return None
     dataset_size = dataset.shape[0]
-    # 用inX来当中心点
-    diffMat = np.tile(inX, (dataset_size, 1)) - dataset
+    # 用input_X来当中心点
+    diffMat = np.tile(input_X, (dataset_size, 1)) - dataset
     # 欧式距离计算
     distances = (diffMat ** 2).sum(axis=1) ** 0.5
     # 排序为了选取距离最近的k个点
@@ -34,6 +34,7 @@ def classify(inX, dataset, labels, k):
 
 def auto_normal(dataset):
     '''归一化特征值'''
+    # newValue = (oldValue - minValue) / (maxValue - minValue)
     min_val = dataset.min(0)
     max_val = dataset.max(0)
     ranges = max_val - min_val
@@ -75,25 +76,55 @@ def plt_dating(x, y, labels):
     plt.show()
 
 
-if __name__ == '__main__':
-    group, labels = create_dataset()
-    label = classify([0, 0], group, labels, 3)
-    # print(label)
+def classify_person():
+    '''约会喜欢程度预测函数'''
+    # 类别
+    result = ('not at all', 'in small doses', 'in large doses')
+    # 收集个人数据
+    person_data = []
+    person_data.append(input('frquent flier miles earned per year?'))
+    person_data.append(input('percentage of time spend playing game?'))
+    person_data.append(input('liters of ice-cream consumed per year?'))
+    # 读取训练数据
+    path = 'D:\code\mygithub\practice-of-machine-learning\kNN\datingTestSet2.txt'
+    dating_matrix, dating_labels = file_to_matrix(path)
+    # 归一化特征值
+    normal_matrix, ranges, min_val = auto_normal(dating_matrix)
+    # person_data 需要归一化
+    # 训练后的数据是浮点数float64，所以运算前需要先将输入数据转换为浮点数    
+    person_data = np.array(person_data, dtype=np.float64)
+    # 分类后的标签
+    classifier_result = classify(
+        (person_data - min_val) / ranges, normal_matrix, dating_labels, 3)
+    print('you will probably lik1e this person: ', result[classifier_result - 1])
 
-    dating_matrix, labels = file_to_matrix(
-        'D:\code\python\ML\kNN\datingTestSet2.txt')
+
+def test_classify_rate():
+    path = 'D:\code\mygithub\practice-of-machine-learning\kNN\datingTestSet2.txt'
+    dating_matrix, labels = file_to_matrix(path)
     # print(dating_matrix, labels)
     # plt_dating(dating_matrix[:, 0], dating_matrix[:, 1], labels)
     normal_matrix, ranges, min_val = auto_normal(dating_matrix)
     print(normal_matrix, ranges, min_val)
     ratio = 0.07
     m = normal_matrix.shape[0]
-    # 测试数据量     
+    # 测试数据量
     test_num = int(m * ratio)
+    # 记录错误率
     err_count = 0
     for i in range(test_num):
-        classifier_result = classify(normal_matrix[i, :], normal_matrix[test_num:m, :], labels[test_num:m], 3)
-        print('the classifier came back with: %d, the real answer is: %d' % (classifier_result, labels[i]))
+        classifier_result = classify(
+            normal_matrix[i, :], normal_matrix[test_num:m, :], labels[test_num:m], 3)
+        print('the classifier came back with: %d, the real answer is: %d' %
+              (classifier_result, labels[i]))
         if classifier_result != labels[i]:
             err_count += 1
     print('the total error rate is: %f' % (err_count / test_num))
+
+
+if __name__ == '__main__':
+    # group, labels = create_dataset()
+    # label = classify([0, 0], group, labels, 3)
+    # print(label)
+    # test_classify_rate()
+    classify_person()
