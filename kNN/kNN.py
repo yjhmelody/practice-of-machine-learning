@@ -47,6 +47,7 @@ def auto_normal(dataset):
 
 
 def file_to_matrix(filename):
+    # 样本
     # 每年里程  游戏时间百分比  消费冰淇淋公升    喜欢程度
     # 40920     8.326976	0.953952	largeDoses
     # 14488	    7.153469	1.673904	smallDoses
@@ -80,16 +81,16 @@ def classify_person():
     '''约会喜欢程度预测函数'''
     # 类别
     result = ('not at all', 'in small doses', 'in large doses')
+    # 读取训练数据
+    path = './datingTestSet2.txt'
+    dating_matrix, dating_labels = file_to_matrix(path)
+    # 归一化特征值
+    normal_matrix, ranges, min_val = auto_normal(dating_matrix)
     # 收集个人数据
     person_data = []
     person_data.append(input('frquent flier miles earned per year?'))
     person_data.append(input('percentage of time spend playing game?'))
     person_data.append(input('liters of ice-cream consumed per year?'))
-    # 读取训练数据
-    path = 'D:\code\mygithub\practice-of-machine-learning\kNN\datingTestSet2.txt'
-    dating_matrix, dating_labels = file_to_matrix(path)
-    # 归一化特征值
-    normal_matrix, ranges, min_val = auto_normal(dating_matrix)
     # person_data 需要归一化
     # 训练后的数据是浮点数float64，所以运算前需要先将输入数据转换为浮点数
     person_data = np.array(person_data, dtype=np.float64)
@@ -101,7 +102,7 @@ def classify_person():
 
 
 def test_classify_rate():
-    path = 'D:\code\mygithub\practice-of-machine-learning\kNN\datingTestSet2.txt'
+    path = './datingTestSet2.txt'
     dating_matrix, labels = file_to_matrix(path)
     # print(dating_matrix, labels)
     # plt_dating(dating_matrix[:, 0], dating_matrix[:, 1], labels)
