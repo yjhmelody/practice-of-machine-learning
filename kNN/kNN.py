@@ -1,5 +1,14 @@
+'''
+1.收集数据
+2.准备数据，格式转换
+3.分析数据
+4.训练数据，kNN不适用
+5.测试数据
+6.使用算法
+'''
 
 import operator
+import os
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -10,15 +19,16 @@ def create_dataset():
     labels = ['A', 'A', 'B', 'B']
     return group, labels
 
-
 def classify(input_X, dataset, labels, k):
+    # input_X 测试数据
+    # dataset 训练数据
     if k < 1:
         return None
     dataset_size = dataset.shape[0]
     # 用input_X来当中心点
-    diffMat = np.tile(input_X, (dataset_size, 1)) - dataset
+    diff_matrix = np.tile(input_X, (dataset_size, 1)) - dataset
     # 欧式距离计算
-    distances = (diffMat ** 2).sum(axis=1) ** 0.5
+    distances = (diff_matrix ** 2).sum(axis=1) ** 0.5
     # 排序为了选取距离最近的k个点
     sorted_distances_index = distances.argsort()
     class_count = {}
@@ -124,9 +134,55 @@ def test_classify_rate():
     print('the total error rate is: %f' % (err_count / test_num))
 
 
+def img_to_vector(filename):
+    # 32*32图片文本转换为1*1024向量
+    vector = np.zeros((1, 1024))
+    with open(filename) as f:
+        for i in range(32):
+            line = f.readline()
+            for j in range(32):
+                vector[0, 32*i+j] = int(line[j])
+    return vector
+
+def handwriting_class_test():
+    labels = []
+    # 获取训练数据目录
+    training_file_list = os.listdir('trainingDigits')
+    # 训练数据量
+    m = len(training_file_list)
+    training_matrix = np.zeros((m, 1024))
+    for i in range(m):
+        filename = training_file_list[i]
+        # 获取该文本对应的数字
+        num_string = int(filename.split('_')[0])
+        labels.append(num_string)
+        # 添加数据到训练矩阵
+        training_matrix[i, :] = img_to_vector('./trainingDigits/%s' % filename)
+    # 测试数据
+    test_file_list = os.listdir('testDigits')
+    err_count = 0
+    # 测试数据量
+    test_m = len(test_file_list)
+    for i in range(test_m):
+        filename = test_file_list[i]
+        # 测试数据对应的数字
+        num_string = int(filename.spilt('_')[0])
+        test_vector = img_to_vector('./testDigits/%s' % filename)
+        classifier_result = classify(test_vector, training_matrix, labels, 3)
+        print('the classifier came back with: %d, the real answer is: %d' % (classifier_result, num_string))
+        if classifier_result != num_string:
+            err_count += 1
+    print('the total number of errors is: %d' % err_count)
+    print('the total error rate is: %d' %(err_count / test_m))
+
+
 if __name__ == '__main__':
     # group, labels = create_dataset()
     # label = classify([0, 0], group, labels, 3)
     # print(label)
+
     # test_classify_rate()
-    classify_person()
+
+    # classify_person()
+
+    handwriting_class_test()
