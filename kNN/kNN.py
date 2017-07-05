@@ -166,14 +166,15 @@ def handwriting_class_test():
     for i in range(test_m):
         filename = test_file_list[i]
         # 测试数据对应的数字
-        num_string = int(filename.spilt('_')[0])
+        num_string = int(filename.split('_')[0])
         test_vector = img_to_vector('./testDigits/%s' % filename)
         classifier_result = classify(test_vector, training_matrix, labels, 3)
-        print('the classifier came back with: %d, the real answer is: %d' % (classifier_result, num_string))
+        # print('the classifier came back with: %d, the real answer is: %d' % (classifier_result, num_string))
         if classifier_result != num_string:
             err_count += 1
+            print(classifier_result,' != ', num_string)
     print('the total number of errors is: %d' % err_count)
-    print('the total error rate is: %d' %(err_count / test_m))
+    print('the total error rate is: %f' % (err_count / test_m))
 
 
 if __name__ == '__main__':
