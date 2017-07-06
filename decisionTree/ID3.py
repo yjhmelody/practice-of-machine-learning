@@ -116,14 +116,24 @@ def create_tree(dataset, labels):
     tree = {
         best_feature_label: {}
     }
-    # 用该特征分类后删除该特征
-    del(labels[best_feature])
+    new_labels = labels[:]
+    # 用该特征分类后删除该特征    
+    del(new_labels[best_feature])
     # 获取该样本最好特征存在的类别
     unique_feature_values = set(example[best_feature] for example in dataset)
     
     for value in unique_feature_values:
-        sub_labels = labels[:]
+        sub_labels = new_labels[:]
         tree[best_feature_label][value] = create_tree(
             split_dataset(dataset, best_feature, value), sub_labels)
 
     return tree
+
+
+if __name__ == '__main__':
+    
+    dataset, labels = create_dataset()
+    tree = create_tree(dataset, labels)
+    print(tree)
+    print(dataset)
+    print(labels)
