@@ -1,0 +1,129 @@
+'''
+1.收集数据
+2.准备数据，只适用于标称型
+3.分析数据，构造树完成后，应该检查图形是否符合预期
+4.训练算法，构造树的数据结构
+5.测试算法，使用经验树计算错误率
+6.使用算法，决策树可以更好地理解数据内在含义
+'''
+
+import math
+import operator
+
+
+def create_dataset():
+    dataset = [
+        [1, 1, 'yes'],
+        [1, 1, 'yes'],
+        [1, 0, 'no'],
+        [0, 1, 'no'],
+        [0, 1, 'no']
+    ]
+    labels = ['no surfacing', 'flippers']
+    return dataset, labels
+
+
+def entropy(dataset):
+    '''计算数据集的信息熵'''
+    label_counts = {}
+    for vector in dataset:
+        # 每个向量最后一个值存放标签
+        label = vector[-1]
+        # 计算各种类别的个数
+        if label not in label_counts.keys():
+            label_counts[label] = 1
+        else:
+            label_counts[label] += 1
+    # 信息熵
+    ent = 0
+    num = len(dataset)
+    for key in label_counts:
+        # 分类的概率
+        p = label_counts[key] / num
+        ent -= p * math.log(p, 2)
+    return ent
+
+
+def split_dataset(dataset, axis, value):
+    '''按照给定特征(axis对应的特征是否等于value)划分数据集'''
+
+    ret_dataset = []
+    for feature_vector in dataset:
+        # axis表示划分的位置
+        if feature_vector[axis] == value:
+            reduced_feature_vector = feature_vector[:axis]
+            reduced_feature_vector.extend(feature_vector[axis + 1:])
+            ret_dataset.append(reduced_feature_vector)
+    return ret_dataset
+
+
+def choose_best_feature_to_split(dataset):
+    '''选择最好特征划分，返回该特征的下标'''
+    feature_num = len(dataset[0]) - 1
+    base_entropy = entropy(dataset)
+    best_info_gain = 0
+    best_feature = -1
+    for i in range(feature_num):
+        # 数据集某种特征的所有值
+        feature = [example[i] for example in dataset]
+        # 创建唯一的分类标签集合
+        unique_feature = set(feature)
+        new_entropy = 0
+        # 计算每种划分方式的信息熵
+        for value in unique_feature:
+            sub_dataset = split_dataset(dataset, i, value)
+            # 计算该特征某个值在该特征的比例
+            p = len(sub_dataset) / len(dataset)
+            new_entropy += p * entropy(sub_dataset)
+        info_gain = base_entropy - new_entropy
+        # 计算最好的信息增益
+        if info_gain > best_info_gain:
+            best_info_gain = info_gain
+            best_feature = i
+    return best_feature
+
+
+def majority_count(class_list):
+    '''多数表决决定分类，返回该类别'''
+    class_count = {}
+    for vote in class_list:
+        if vote not in class_count.keys():
+            class_count[vote] = 1
+        else:
+            class_count[vote] += 1
+        # print(class_count[vote], vote)
+
+    sorted_class_count = sorted(
+        class_count.items(), key=operator.itemgetter(1), reverse=True)
+    print(sorted_class_count)
+    return sorted_class_count[0][0]
+
+
+def create_tree(dataset, labels):
+    '''递归创建决策树'''
+    # 每个数据对应的分类
+    class_list = [example[-1] for example in dataset]
+    # 类别完全相同则停止继续划分
+    if class_list.count(class_list[0]) == len(class_list):
+        # 返回当前类别
+        return class_list[0]
+    # 划分到只有一个特征时
+    if len(dataset[0]) == 1:
+        # 返回多数表决的类别
+        return majority_count(class_list)
+    best_feature = choose_best_feature_to_split(dataset)
+    best_feature_label = labels[best_feature]
+    tree = {
+        best_feature_label: {}
+    }
+    # 用该特征分类后删除该特征
+    del(labels[best_feature])
+    # 获取该样本最好特征存在的类别
+    unique_feature_values = set(example[best_feature] for example in dataset)
+    
+    for value in unique_feature_values:
+        sub_labels = labels[:]
+        tree[best_feature_label][value] = create_tree(
+            split_dataset(dataset, best_feature, value), sub_labels)
+
+    return tree
