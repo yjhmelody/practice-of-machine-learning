@@ -10,6 +10,8 @@
 import math
 import operator
 
+import matplotlib.pyplot as plt
+
 
 def create_dataset():
     dataset = [
@@ -117,11 +119,11 @@ def create_tree(dataset, labels):
         best_feature_label: {}
     }
     new_labels = labels[:]
-    # 用该特征分类后删除该特征    
+    # 用该特征分类后删除该特征
     del(new_labels[best_feature])
     # 获取该样本最好特征存在的类别
     unique_feature_values = set(example[best_feature] for example in dataset)
-    
+
     for value in unique_feature_values:
         sub_labels = new_labels[:]
         tree[best_feature_label][value] = create_tree(
@@ -130,10 +132,40 @@ def create_tree(dataset, labels):
     return tree
 
 
+decision_node = {
+    'boxstyle': 'sawtooth',
+    'fc': '0.8'
+}
+
+leaf_node = {
+    'boxstyle': 'round4',
+    'fc': '0.8'
+}
+
+arrow_args = {
+    'arrowstyle': '<-'
+}
+
+
+def plot_node(node_text, center_point, parent_point, node_type):
+    create_plot.ax1.annotate(node_text, xy=parent_point, xytext=center_point, 
+    textcoords='axes fraction', va='center', ha='center', bbox=node_type, arrowprops=arrow_args)
+
+
+def create_plot():
+    figure = plt.figure(1, facecolor='white')
+    figure.clf()
+    create_plot.ax1 = plt.subplot(111, frameon=False)
+    plot_node(u'决策节点', (0.5, 0.1), (0.1, 0.5), decision_node)
+    plot_node(u'决策节点', (0.8, 0.1), (0.3, 0.8), leaf_node)
+    plt.show()
+
+
+
 if __name__ == '__main__':
-    
     dataset, labels = create_dataset()
     tree = create_tree(dataset, labels)
     print(tree)
     print(dataset)
     print(labels)
+    create_plot()
