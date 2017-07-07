@@ -131,6 +131,26 @@ def create_tree(dataset, labels):
 
     return tree
 
+def classify(input_tree, feature_label, test_datset):
+    '''用决策树进行分类'''
+    # 第一个分类特征
+    # first_feature = input_tree[0]
+    for key in input_tree.keys():
+        first_feature = key
+        break
+    # 第一次分类后的字典
+    sencond_dict = input_tree[first_feature]
+    # 找到在第一个分类在特征标签里的下标
+    first_feature_index = feature_label.index(first_feature)
+    for key in sencond_dict.keys():
+        if test_datset[first_feature_index] == key:
+            # 判断该键存储的值是否是字典
+            if type(sencond_dict[key]).__name__ == 'dict':
+                class_label = classify(sencond_dict[key], feature_label, test_datset)
+            else:
+                class_label = sencond_dict[key]
+    return class_label
+
 
 decision_node = {
     'boxstyle': 'sawtooth',
@@ -168,4 +188,6 @@ if __name__ == '__main__':
     print(tree)
     print(dataset)
     print(labels)
-    create_plot()
+    print(classify(tree, labels, [1, 0]))
+    print(classify(tree, labels, [1, 1]))
+    # create_plot()
