@@ -9,6 +9,7 @@
 
 import math
 import operator
+import pickle
 
 import matplotlib.pyplot as plt
 
@@ -133,8 +134,7 @@ def create_tree(dataset, labels):
 
 def classify(input_tree, feature_label, test_datset):
     '''用决策树进行分类'''
-    # 第一个分类特征
-    # first_feature = input_tree[0]
+    # 第一个分类特征 即前序遍历
     for key in input_tree.keys():
         first_feature = key
         break
@@ -181,6 +181,23 @@ def create_plot():
     plt.show()
 
 
+# 利用 pickle 模块持久化训练好的决策树
+def store_tree(input_tree, filename):
+    with open(filename, 'w') as f:
+        pickle.dump(str(input_tree), f)
+
+
+def recover_tree(filename):
+    with open(filename, 'r') as f:
+        return pickle.load(f)
+
+
+def test_lenses():
+    with open('lenses.txt') as f:
+        lenses = [line.strip().split('\t') for line in f.readlines()]
+        lenses_label = ['age', 'prescript', 'astigmatic', 'tearRate']
+        lenses_tree = create_tree(lenses, lenses_label)
+        print('lenses tree: ', lenses_tree)
 
 if __name__ == '__main__':
     dataset, labels = create_dataset()
@@ -188,6 +205,14 @@ if __name__ == '__main__':
     print(tree)
     print(dataset)
     print(labels)
+
     print(classify(tree, labels, [1, 0]))
     print(classify(tree, labels, [1, 1]))
+
     # create_plot()
+
+    # store_tree(tree, 'classify_tree.txt')
+    # print(recover_tree('classify_tree.txt'))
+
+    test_lenses()
+
