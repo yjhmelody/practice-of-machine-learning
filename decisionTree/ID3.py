@@ -211,8 +211,8 @@ if __name__ == '__main__':
 
     # create_plot()
 
-    # store_tree(tree, 'classify_tree.txt')
-    # print(recover_tree('classify_tree.txt'))
+    store_tree(tree, 'classify_tree.txt')
+    print(recover_tree('classify_tree.txt'))
 
     test_lenses()
 
