@@ -15,9 +15,9 @@ from matplotlib import pyplot as plt
 
 
 def create_dataset():
-    group = np.array([[1, 1.1], [1, 1], [0, 0], [0, 0.1]])
+    dataset = np.array([[1, 1.1], [1, 1], [0, 0], [0, 0.1]])
     labels = ['A', 'A', 'B', 'B']
-    return group, labels
+    return dataset, labels
 
 def classify(input_X, dataset, labels, k):
     # input_X 测试数据
