@@ -27,17 +27,28 @@ def sigmoid(z):
     '''类跃阶函数'''
     return 1 / (1 + np.exp(-z))
 
-def gradient_ascent(X, y, alpha=0.0001, iterations=1000):
+def gradient_ascent(X, y, alpha=0.0125, iterations=10000):
     '''梯度上升算法'''
-    X = np.array(X)
-    y = np.array(y).transpose()
+    X = np.array(X, dtype=np.float64)
+    y = np.array(y, dtype=np.float64).transpose()
     # theta初始化为长度为特征数的列向量
-    theta = np.ones(x.shape[1])
+    theta = np.ones(X.shape[1])
     for iteration in range(iterations):
-        h = sigmoid(X * theta)
-        error = y - h
-        theta = theta + alpha * X.transpose() * error
-
+        h = sigmoid(np.dot(X, theta))
+        # print('X', X.shape)
+        # print('theta', theta.shape)
+        # print('X * theta', np.dot(X, theta).shape)
+        # print('y', y.shape)
+        # print('h', h.shape)
+        error = np.subtract(y, h)
+        # print('error', error.shape)
+        # print('X', X.T.shape)
+        theta = theta + alpha * X.transpose().dot(error)
+        print(theta)
+    return theta
 
 if __name__ =='__main__':
-    pass
+    data, label = load_dataset()
+    weights = gradient_ascent(data, label)
+    print(weights)
+    
