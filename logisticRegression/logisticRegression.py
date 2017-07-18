@@ -94,6 +94,7 @@ def plot_best_fit(weights):
 
 if __name__ == '__main__':
     data, label = load_dataset()
-    weights = gradient_ascent(data, label)
-    plot_best_fit(weights)
+    weights = gradient_ascent(data, label, alpha=0.012, iterations=30000)
     print(weights)
+    plot_best_fit(weights)
+
