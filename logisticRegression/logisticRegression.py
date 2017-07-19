@@ -1,5 +1,4 @@
 #-*- coding:utf-8 -*-
-
 '''
 1.收集数据
 2.准备数据，由于需要计算距离，因此要求数值型，另外，结构化数据最佳
@@ -12,7 +11,6 @@
 '''
 
 import numpy as np
-
 
 def load_dataset():
     data = []
@@ -40,6 +38,7 @@ def gradient_ascent(X, y, alpha=0.0128, iterations=30000):
     for iteration in range(iterations):
 
         h = sigmoid(np.dot(X, theta))
+
         # print('X', X.shape)
         # print('theta', theta.shape)
         # print('X * theta', np.dot(X, theta).shape)
@@ -47,14 +46,12 @@ def gradient_ascent(X, y, alpha=0.0128, iterations=30000):
         # print('h', h.shape)
 
         error = np.subtract(y, h)
+        cost = np.sum(error ** 2) / (2 * m)
 
         # print('error', error.shape)
         # print('X', X.T.shape)
 
-        # cost = np.sum(error ** 2) / (2 * m)
-
         # theta = theta + alpha * (np.dot(X.transpose(), error) / m)
-
         theta = theta + alpha * np.dot(X.transpose(), error)
 
         # print('theta',theta)
@@ -66,27 +63,28 @@ def gradient_ascent(X, y, alpha=0.0128, iterations=30000):
 
 def plot_best_fit(weights):
     import matplotlib.pyplot as plt
-    dataMat, labelMat = load_dataset()
-    dataArr = np.array(dataMat)
-    n = np.shape(dataArr)[0]
-    xcord1 = []
-    ycord1 = []
-    xcord2 = []
-    ycord2 = []
+
+    data, label = load_dataset()
+    data = np.array(data)
+
+    n = np.shape(data)[0]
+    x1, y1, x2, y2 = [], [], [], []
+
     for i in range(n):
-        if int(labelMat[i]) == 1:
-            xcord1.append(dataArr[i, 1])
-            ycord1.append(dataArr[i, 2])
+        # str -> int
+        if int(label[i]) == 1:
+            x1.append(data[i, 1])
+            y1.append(data[i, 2])
         else:
-            xcord2.append(dataArr[i, 1])
-            ycord2.append(dataArr[i, 2])
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.scatter(xcord1, ycord1, s=30, c='red', marker='s')
-    ax.scatter(xcord2, ycord2, s=30, c='green')
+            x2.append(data[i, 1])
+            y2.append(data[i, 2])
+    plt.scatter(x1, y1, s=20, c='red')
+    plt.scatter(x2, y2, s=20, c='green')
+    
     x = np.arange(-3.0, 3.0, 0.1)
     y = (-weights[0] - weights[1] * x) / weights[2]
-    ax.plot(x, y)
+
+    plt.plot(x, y)
     plt.xlabel('X1')
     plt.ylabel('X2')
     plt.show()
