@@ -83,8 +83,7 @@ def SGA(X, y, init_alpha=0.01, iterations=300):
     return theta
 
 
-def plot_best_fit(weights):
-    data, label = load_dataset()
+def plot_logistic_regression(data, label, weights):
     data = np.array(data)
 
     n = np.shape(data)[0]
@@ -111,6 +110,7 @@ def plot_best_fit(weights):
 
 
 def classify_vector(X, weights):
+    '''根据sigmoid来二分类'''
     p = sigmoid(np.dot(X, weights))
     if p > 0.5:
         return 1
@@ -120,7 +120,7 @@ def classify_vector(X, weights):
 
 def colic_test(iterations=500):
     '''疝气病预测病马🐎的死亡率'''
-    file_train = open('horseColicTest.txt')
+    file_train = open('horseColicTraining.txt')
     file_test = open('horseColicTest.txt')
     X_train, y_train = [], []
 
@@ -134,24 +134,27 @@ def colic_test(iterations=500):
         # 类别
         y_train.append(line[21])
 
+    # 训练weights
     train_weights = SGA(np.array(X_train, dtype=np.float64),
-                        y_train, iterations)
+                        y_train, iterations=iterations)
+    # 进行预测并求错误率
     error_count = 0
-    count = 0
+    pred_count = 0
     for line in file_test.readlines():
         line = line.strip().split('\t')
         feature_vector = []
         for i in range(21):
             feature_vector.append(float(line[i]))
+            # 测试
         if int(classify_vector(np.array(feature_vector, dtype=np.float64), train_weights)) != int(line[21]):
             error_count += 1
-        count += 1
-    error_rate = float(error_count) / count
+        pred_count += 1
+    error_rate = float(error_count) / pred_count
     print('the error rate of this test is: %f' % error_rate)
     return error_rate
 
 
-def multi_test(num_test=10, iterations=500):
+def multi_test(num_test, iterations):
     error_sum = 0
     for i in range(num_test):
         error_sum += colic_test(iterations)
@@ -160,12 +163,12 @@ def multi_test(num_test=10, iterations=500):
 
 
 if __name__ == '__main__':
-    # data, label = load_dataset('testSet.txt')
+    data, label = load_dataset('testSet.txt')
     # weights1 = gradient_ascent(data, label, alpha=0.0128, iterations=30000)
     # print(weights1)
-    # weights2 = SGA(data, label, init_alpha=0.01, iterations=3000)
+    # weights2 = SGA(data, label, init_alpha=0.01, iterations=30000)
     # print(weights2)
-    # plot_best_fit(weights1)
-    # plot_best_fit(weights2)
+    # plot_logistic_regression(data, label, weights1)
+    # plot_logistic_regression(data, label, weights2)
 
-    multi_test(num_test=30, iterations=1000)
+    multi_test(num_test=10, iterations=3000)
