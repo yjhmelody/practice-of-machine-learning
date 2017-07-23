@@ -118,7 +118,7 @@ def classify_vector(X, weights):
         return 0
 
 
-def colic_test():
+def colic_test(iterations=500):
     '''疝气病预测病马🐎的死亡率'''
     file_train = open('horseColicTest.txt')
     file_test = open('horseColicTest.txt')
@@ -135,7 +135,7 @@ def colic_test():
         y_train.append(line[21])
 
     train_weights = SGA(np.array(X_train, dtype=np.float64),
-                        y_train, iterations=500)
+                        y_train, iterations)
     error_count = 0
     count = 0
     for line in file_test.readlines():
@@ -151,12 +151,12 @@ def colic_test():
     return error_rate
 
 
-def multi_test(num_test=10):
+def multi_test(num_test=10, iterations=500):
     error_sum = 0
     for i in range(num_test):
-        error_sum += colic_test()
-    print('after %d iterations the average error rate is: %f' %
-          (num_test, error_sum / num_test))
+        error_sum += colic_test(iterations)
+    print('after %d test with %d iterations, the average error rate is: %f' %
+          (num_test, iterations, error_sum / num_test))
 
 
 if __name__ == '__main__':
@@ -168,4 +168,4 @@ if __name__ == '__main__':
     # plot_best_fit(weights1)
     # plot_best_fit(weights2)
 
-    multi_test(20)
+    multi_test(num_test=30, iterations=1000)
