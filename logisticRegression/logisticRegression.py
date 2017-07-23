@@ -109,6 +109,7 @@ def plot_best_fit(weights):
     plt.ylabel('X2')
     plt.show()
 
+
 def classify_vector(X, weights):
     p = sigmoid(np.dot(X, weights))
     if p > 0.5:
@@ -116,12 +117,13 @@ def classify_vector(X, weights):
     else:
         return 0
 
+
 def colic_test():
     '''疝气病预测病马🐎的死亡率'''
     file_train = open('horseColicTest.txt')
     file_test = open('horseColicTest.txt')
     X_train, y_train = [], []
-    
+
     for line in file_train.readlines():
         line = line.strip().split('\t')
         feature_vector = []
@@ -132,7 +134,8 @@ def colic_test():
         # 类别
         y_train.append(line[21])
 
-    train_weights = SGA(np.array(X_train, dtype=np.float64), y_train, iterations=500)
+    train_weights = SGA(np.array(X_train, dtype=np.float64),
+                        y_train, iterations=500)
     error_count = 0
     count = 0
     for line in file_test.readlines():
@@ -147,11 +150,13 @@ def colic_test():
     print('the error rate of this test is: %f' % error_rate)
     return error_rate
 
+
 def multi_test(num_test=10):
     error_sum = 0
     for i in range(num_test):
         error_sum += colic_test()
-    print('after %d iterations the average error rate is: %f' % (num_test, error_sum / num_test))
+    print('after %d iterations the average error rate is: %f' %
+          (num_test, error_sum / num_test))
 
 
 if __name__ == '__main__':
@@ -164,11 +169,3 @@ if __name__ == '__main__':
     # plot_best_fit(weights2)
 
     multi_test(20)
-
-
-
-
-
-
-
-    
