@@ -61,6 +61,7 @@ def SGA(X, y, init_alpha=0.01, iterations=300):
     m, n = X.shape
     theta = np.ones(n)
     # 每次随机选择一个来进行梯度上升
+    # 总迭代次数是 iterations * m
     for iteration in range(iterations):
         for i in range(m):
             # 随迭代递减学习率
@@ -107,7 +108,7 @@ if __name__ == '__main__':
     data, label = load_dataset()
     weights1 = gradient_ascent(data, label, alpha=0.0128, iterations=30000)
     print(weights1)
-    weights2 = SGA(data, label, init_alpha=0.1, iterations=100000)
+    weights2 = SGA(data, label, init_alpha=0.01, iterations=3000)
     print(weights2)
-    # plot_best_fit(weights1)
+    plot_best_fit(weights1)
     plot_best_fit(weights2)
