@@ -2,6 +2,13 @@
 '''
 1.收集数据
 2.准备数据，由于需要计算距离，因此要求数值型，另外，结构化数据最佳
+处理数据中的缺失值可选方法：
+    使用可用特征的均值来填补缺失值
+    使用特殊值来填补缺失值，如-1
+    忽略有缺失值的样本
+    使用相似样本的均值填补缺失值
+    使用另外的机器学习算法预测缺失值
+
 3.分析数据，采用任意方法
 4.训练算法，大部分时间用于训练，目的是为找到最佳的分类回归系数
 5.测试算法，一旦训练完成，分类将会很快
@@ -11,12 +18,13 @@
 '''
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
-def load_dataset():
+def load_dataset(filename):
     data = []
     label = []
-    with open('testSet.txt') as f:
+    with open(filename) as f:
         for line in f.readlines():
             line = line.strip().split()
             data.append([1, line[0], line[1]])
@@ -76,8 +84,6 @@ def SGA(X, y, init_alpha=0.01, iterations=300):
 
 
 def plot_best_fit(weights):
-    import matplotlib.pyplot as plt
-
     data, label = load_dataset()
     data = np.array(data)
 
@@ -103,12 +109,66 @@ def plot_best_fit(weights):
     plt.ylabel('X2')
     plt.show()
 
+def classify_vector(X, weights):
+    p = sigmoid(np.dot(X, weights))
+    if p > 0.5:
+        return 1
+    else:
+        return 0
+
+def colic_test():
+    '''疝气病预测病马🐎的死亡率'''
+    file_train = open('horseColicTest.txt')
+    file_test = open('horseColicTest.txt')
+    X_train, y_train = [], []
+    
+    for line in file_train.readlines():
+        line = line.strip().split('\t')
+        feature_vector = []
+        # 特征数
+        for i in range(21):
+            feature_vector.append(float(line[i]))
+        X_train.append(feature_vector)
+        # 类别
+        y_train.append(line[21])
+
+    train_weights = SGA(np.array(X_train, dtype=np.float64), y_train, iterations=500)
+    error_count = 0
+    count = 0
+    for line in file_test.readlines():
+        line = line.strip().split('\t')
+        feature_vector = []
+        for i in range(21):
+            feature_vector.append(float(line[i]))
+        if int(classify_vector(np.array(feature_vector, dtype=np.float64), train_weights)) != int(line[21]):
+            error_count += 1
+        count += 1
+    error_rate = float(error_count) / count
+    print('the error rate of this test is: %f' % error_rate)
+    return error_rate
+
+def multi_test(num_test=10):
+    error_sum = 0
+    for i in range(num_test):
+        error_sum += colic_test()
+    print('after %d iterations the average error rate is: %f' % (num_test, error_sum / num_test))
+
 
 if __name__ == '__main__':
-    data, label = load_dataset()
-    weights1 = gradient_ascent(data, label, alpha=0.0128, iterations=30000)
-    print(weights1)
-    weights2 = SGA(data, label, init_alpha=0.01, iterations=3000)
-    print(weights2)
-    plot_best_fit(weights1)
-    plot_best_fit(weights2)
+    # data, label = load_dataset('testSet.txt')
+    # weights1 = gradient_ascent(data, label, alpha=0.0128, iterations=30000)
+    # print(weights1)
+    # weights2 = SGA(data, label, init_alpha=0.01, iterations=3000)
+    # print(weights2)
+    # plot_best_fit(weights1)
+    # plot_best_fit(weights2)
+
+    multi_test(20)
+
+
+
+
+
+
+
+    
