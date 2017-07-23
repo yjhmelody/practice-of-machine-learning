@@ -36,27 +36,10 @@ def gradient_ascent(X, y, alpha=0.0128, iterations=30000):
     theta = np.ones(X.shape[1])
     m = X.shape[0]
     for iteration in range(iterations):
-
         h = sigmoid(np.dot(X, theta))
-
-        # print('X', X.shape)
-        # print('theta', theta.shape)
-        # print('X * theta', np.dot(X, theta).shape)
-        # print('y', y.shape)
-        # print('h', h.shape)
-
         error = np.subtract(y, h)
         cost = np.sum(error ** 2) / (2 * m)
-
-        # print('error', error.shape)
-        # print('X', X.T.shape)
-
-        # theta = theta + alpha * (np.dot(X.transpose(), error) / m)
         theta = theta + alpha * np.dot(X.transpose(), error)
-
-        # print('theta',theta)
-        # print('cost', cost)
-        # print()
 
     return theta
 
@@ -83,8 +66,8 @@ def plot_best_fit(weights):
     
     x = np.arange(-3.0, 3.0, 0.1)
     y = (-weights[0] - weights[1] * x) / weights[2]
-
     plt.plot(x, y)
+
     plt.xlabel('X1')
     plt.ylabel('X2')
     plt.show()
