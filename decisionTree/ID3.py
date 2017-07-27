@@ -142,9 +142,7 @@ def create_tree(dataset, labels):
 def classify(input_tree, feature_label, test_datset):
     '''用决策树进行分类'''
     # 第一个分类特征 即前序遍历
-    for key in input_tree.keys():
-        first_feature = key
-        break
+    first_feature = input_tree.keys()[0]
     # 第一次分类后的字典或者类别
     sencond_dict = input_tree[first_feature]
     
