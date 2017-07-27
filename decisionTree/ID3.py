@@ -65,7 +65,7 @@ def choose_best_feature_to_split(dataset):
     feature_num = len(dataset[0]) - 1
     base_entropy = entropy(dataset)
     best_info_gain = 0
-    best_feature = -1
+    best_feature_index = -1
     for i in range(feature_num):
         # 数据集某种特征的所有值
         feature = [example[i] for example in dataset]
@@ -82,8 +82,8 @@ def choose_best_feature_to_split(dataset):
         # 计算最好的信息增益
         if info_gain > best_info_gain:
             best_info_gain = info_gain
-            best_feature = i
-    return best_feature
+            best_feature_index = i
+    return best_feature_index
 
 
 def majority_count(class_list):
@@ -110,27 +110,34 @@ def create_tree(dataset, labels):
     if class_list.count(class_list[0]) == len(class_list):
         # 返回当前类别
         return class_list[0]
+
     # 划分到只有一个特征时
     if len(dataset[0]) == 1:
         # 返回多数表决的类别
         return majority_count(class_list)
-    best_feature = choose_best_feature_to_split(dataset)
-    best_feature_label = labels[best_feature]
+    
+    # 选出最优划分特征
+    best_feature_index = choose_best_feature_to_split(dataset)
+    best_feature_label = labels[best_feature_index]
+
     tree = {
         best_feature_label: {}
     }
+
     new_labels = labels[:]
     # 用该特征分类后删除该特征
-    del(new_labels[best_feature])
+    del(new_labels[best_feature_index])
     # 获取该样本最好特征存在的类别
-    unique_feature_values = set(example[best_feature] for example in dataset)
+    unique_feature_values = set(
+        example[best_feature_index] for example in dataset)
 
     for value in unique_feature_values:
         sub_labels = new_labels[:]
         tree[best_feature_label][value] = create_tree(
-            split_dataset(dataset, best_feature, value), sub_labels)
+            split_dataset(dataset, best_feature_index, value), sub_labels)
 
     return tree
+
 
 def classify(input_tree, feature_label, test_datset):
     '''用决策树进行分类'''
@@ -138,15 +145,17 @@ def classify(input_tree, feature_label, test_datset):
     for key in input_tree.keys():
         first_feature = key
         break
-    # 第一次分类后的字典
+    # 第一次分类后的字典或者类别
     sencond_dict = input_tree[first_feature]
-    # 找到在第一个分类在特征标签里的下标
+    
+    # 找到第一个分类在特征标签里的下标
     first_feature_index = feature_label.index(first_feature)
     for key in sencond_dict.keys():
         if test_datset[first_feature_index] == key:
             # 判断该键存储的值是否是字典
             if type(sencond_dict[key]).__name__ == 'dict':
-                class_label = classify(sencond_dict[key], feature_label, test_datset)
+                class_label = classify(
+                    sencond_dict[key], feature_label, test_datset)
             else:
                 class_label = sencond_dict[key]
     return class_label
@@ -168,8 +177,8 @@ arrow_args = {
 
 
 def plot_node(node_text, center_point, parent_point, node_type):
-    create_plot.ax1.annotate(node_text, xy=parent_point, xytext=center_point, 
-    textcoords='axes fraction', va='center', ha='center', bbox=node_type, arrowprops=arrow_args)
+    create_plot.ax1.annotate(node_text, xy=parent_point, xytext=center_point,
+                             textcoords='axes fraction', va='center', ha='center', bbox=node_type, arrowprops=arrow_args)
 
 
 def create_plot():
@@ -199,6 +208,7 @@ def test_lenses():
         lenses_tree = create_tree(lenses, lenses_label)
         print('lenses tree: ', lenses_tree)
 
+
 if __name__ == '__main__':
     dataset, labels = create_dataset()
     tree = create_tree(dataset, labels)
@@ -215,4 +225,3 @@ if __name__ == '__main__':
     print(recover_tree('classify_tree.txt'))
 
     test_lenses()
-

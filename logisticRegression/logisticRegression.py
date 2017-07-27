@@ -171,4 +171,4 @@ if __name__ == '__main__':
     # plot_logistic_regression(data, label, weights1)
     # plot_logistic_regression(data, label, weights2)
 
-    multi_test(num_test=10, iterations=3000)
+    multi_test(num_test=20, iterations=100)
