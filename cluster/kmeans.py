@@ -32,3 +32,8 @@ def rand_centers(dataset, k):
     centers = min_feature + (max_feature - min_feature) * np.random.rand(k, n)
     return centers
 
+def kmeans(dataset, k=2, distance=distance, rand_centers=rand_centers):
+    '''k-means算法'''
+    
+
+    
