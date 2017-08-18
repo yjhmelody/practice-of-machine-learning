@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 import struct
+import numpy as np
 from nn import *
 from datetime import datetime
 # 数据加载器基类
@@ -100,8 +101,8 @@ def get_training_data_set():
     '''
     获得训练数据集
     '''
-    image_loader = ImageLoader('train-images-idx3-ubyte', 60000)
-    label_loader = LabelLoader('train-labels-idx1-ubyte', 60000)
+    image_loader = ImageLoader('./train-images', 6000)
+    label_loader = LabelLoader('./train-labels', 6000)
     return image_loader.load(), label_loader.load()
 
 
@@ -109,8 +110,8 @@ def get_test_data_set():
     '''
     获得测试数据集
     '''
-    image_loader = ImageLoader('t10k-images-idx3-ubyte', 10000)
-    label_loader = LabelLoader('t10k-labels-idx1-ubyte', 10000)
+    image_loader = ImageLoader('./t10k-images', 1000)
+    label_loader = LabelLoader('./t10k-labels', 1000)
     return image_loader.load(), label_loader.load()
 
 
@@ -140,6 +141,18 @@ def train_and_evaluate():
     epoch = 0
     train_data_set, train_labels = get_training_data_set()
     test_data_set, test_labels = get_test_data_set()
+
+    train_data_set = np.array(train_data_set)
+    train_labels = np.array(train_labels)
+    test_data_set = np.array(test_data_set)
+    test_labels = np.array(test_labels)
+
+    # print(train_data_set.shape)
+    # print(train_labels.shape)
+    # print(test_data_set.shape)
+    # print(test_labels.shape)
+
+    # 输入向量784 隐藏层300 输出向量10
     network = Network([784, 300, 10])
     while True:
         epoch += 1

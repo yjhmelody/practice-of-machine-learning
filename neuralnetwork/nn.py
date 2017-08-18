@@ -17,9 +17,9 @@ class FullConnectedLayer():
         # 权重数组
         self.W = np.random.uniform(-0.1, 0.1, (output_size, input_size))
         # 偏执项
-        self.b = np.zeros(output_size)
+        self.b = np.zeros((output_size, 1))
         # 输出向量
-        # self.output = np.zeros(output_size)
+        # self.output = np.zeros((output_size, 1))
 
     def forward(self, input_array):
         '''
@@ -27,6 +27,10 @@ class FullConnectedLayer():
         input_array: 输入向量，维度为input_size
         '''
         self.input = input_array
+        print(self.W.shape)
+        print(input_array.shape)
+        print(self.b.shape)
+        print()
         self.output = self.activator.forward(
             np.dot(self.W, input_array) + self.b)
 
@@ -36,10 +40,18 @@ class FullConnectedLayer():
         delta_array: 从上一层传入的误差项
         '''
         # self.delta是偏差项,用来反向计算self.delta
-        self.delta = self.activator.backward(
-            self.input) * np.dot(self.W.T, delta_array)
+        # print('W', self.W.shape)
+        # print('delta', delta_array.shape)
+        a = self.activator.backward(self.input)
+        b = np.dot(self.W.T, delta_array)
+        print(a.shape)
+        print(b.shape)
+        
+        self.delta = a * b
 
-        self.W_grad = np.dot(delta_array, self.input)
+        # self.delta = self.activator.backward(self.input) * np.dot(self.W.T, delta_array)
+
+        self.W_grad = np.dot(delta_array, self.input.T)
         self.b_grad = delta_array
 
     def update(self, learning_rate):
@@ -81,22 +93,33 @@ class Network():
     def train(self, dataset, labels, rate, epoch):
         '''
         训练数据
-        dataset: 输入集
-        labels: 样本标签
+        dataset: 训练集特征
+        labels: 训练集标签
         rate: 学习率
         epoch: 训练轮数
         '''
+        print(dataset.shape)
+        print(labels.shape)
+        print()
+
         for i in range(epoch):
             for d in range(len(dataset)):
                 self.train_one_sample(dataset[d], labels[d], rate)
 
-    def train_one_sample(self, label, data, rate):
-        self.predict(sample)
+    def train_one_sample(self, data, label, rate):
+        # print(data.shape)
+        # print(label.shape)
+        # print()
+        
+        self.predict(data)
         self.calc_gradient(label)
         self.update_weight(rate)
 
     def calc_gradient(self, label):
         # 输出层计算
+        # print(len(label))
+        label = np.array(label).reshape((len(label), 1))
+        # print(self.layers[-1].output.shape)
         delta = self.layers[-1].activator.backward(
             self.layers[-1].output) * (label - self.layers[-1].output)
         # 隐藏层计算
