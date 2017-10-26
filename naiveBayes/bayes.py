@@ -46,9 +46,7 @@ def naive_bayes(dataset, labels):
     '''输入为文档矩阵，文档标签向量'''
     num_documents = len(dataset)
     num_words = len(dataset[0])
-    # 侮辱性文字的概率
     p_abusive = sum(labels) / num_documents
-    # 初始化分子分母变量
     p0_num_words = np.zeros(num_words)
     p1_num_words = np.zeros(num_words)
     p0_denom = 0
@@ -61,11 +59,9 @@ def naive_bayes(dataset, labels):
         else:
             p0_num_words += dataset[i]
             p0_denom += sum(dataset[i])
-        
     p1 = p1_num_words / p1_denom
     p0 = p0_num_words / p0_denom
     return p0, p1, p_abusive
-
 
 if __name__ == '__main__':
     dataset, labels = create_dataset()
@@ -75,6 +71,6 @@ if __name__ == '__main__':
     for data in dataset:
         train_matrix.append(set_of_words_to_vector(vocabulary, data))
     p0, p1, p_abusive = naive_bayes(train_matrix, labels)
-    # print(p0)
-    # print(p1)
-    # print(p_abusive)
+    print(p0)
+    print(p1)
+    print(p_abusive)

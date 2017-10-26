@@ -1,4 +1,3 @@
-#-*- coding:utf-8 -*-
 '''
 1.收集数据，使用任意方法
 2.准备数据，需要数值型来计算距离，也可以讲标称数据转换为二值型数据计算距离
@@ -10,6 +9,7 @@
 
 import numpy as np
 
+
 def load_dataset(filename):
     dataset = []
     with open(filename) as f:
@@ -19,9 +19,11 @@ def load_dataset(filename):
             dataset.append(line)
     return dataset
 
+
 def distance(A, B):
     '''返回A B的欧几里德距离'''
     return np.sqrt(np.sum(np.square(A - B)))
+
 
 def rand_centers(dataset, k):
     '''随机生成k个簇心'''
@@ -32,8 +34,7 @@ def rand_centers(dataset, k):
     centers = min_feature + (max_feature - min_feature) * np.random.rand(k, n)
     return centers
 
+
 def kmeans(dataset, k=2, distance=distance, rand_centers=rand_centers):
     '''k-means算法'''
-    
-
-    
+    pass
