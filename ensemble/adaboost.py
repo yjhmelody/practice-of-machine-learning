@@ -2,8 +2,11 @@ import math
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.datasets import make_gaussian_quantiles
+from sklearn.datasets import load_iris
 
 
 def load_dataset(path):
@@ -26,9 +29,8 @@ class Adaboost():
         self.__alpha = []
 
     def __sign(self, x):
-        x = np.copy(x)
-        np.where(x > 0, 1, -1)
-        np.where(x == 0, 0, x)
+        x = np.where(x > 0, 1, -1)
+        x = np.where(x == 0, 0, x)
         return x
 
     def fit(self, X, y, iteration):
@@ -62,16 +64,21 @@ class Adaboost():
 if __name__ == '__main__':
     train_X, train_y = load_dataset('data/horseColicTraining2.txt')
     test_X, test_y = load_dataset('data/horseColicTest2.txt')
+    # train_X, train_y = load_iris(True)
+    # train_X = pd.read_csv('data/train.csv', header=0,)
+    # seq = np.random.permutation(train_y)[:100]
+    # test_X, test_y = train_X[seq], train_y[seq]
+    # # print(train_X.shape, train_y.shape)
+    
 
-    clf = DecisionTreeClassifier(random_state=1)
+    clf = DecisionTreeClassifier(random_state=1, max_depth=2)
+    # clf = LogisticRegression(random_state=1)
     clf.fit(train_X, train_y)
     predict_y = clf.predict(test_X)
-
-    # print(predit_y == test_y)
     print(np.sum(test_y == predict_y) / len(test_y))
-    print('sum', np.sum(predict_y))
 
-    boost = Adaboost(DecisionTreeClassifier(random_state=1))
-    boost.fit(train_X, train_y, 3)
+    boost = Adaboost(DecisionTreeClassifier(random_state=1, max_depth=2))
+    # boost = Adaboost(LogisticRegression(random_state=1))
+    boost.fit(train_X, train_y, 100)
     predict_y = boost.predict(test_X)
-    print(np.sum(test_y != predict_y) / len(test_y))
+    print(np.sum(test_y == predict_y) / len(test_y))
